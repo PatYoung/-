@@ -46,7 +46,7 @@ PROGRAM root
     WRITE(*,"(4X,20A)") "3.Secant."
     WRITE(*,"(4X,20A)") "0.Exit the program."
     501 READ(*,*) i
-    !判断选择方法
+    !判断选择方法,加入循环，从一位有效数字计算到所需精度
     DO WHILE (l <= n)
         IF (i == 1) THEN
             CALL bisection()
@@ -91,7 +91,7 @@ END FUNCTION
 SUBROUTINE bisection()                                      !二分法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
-    OPEN(UNIT = 11, POSITION = 'APPEND', FILE = "1.dat")
+    OPEN(UNIT = 11, POSITION = 'APPEND', FILE = "1.dat")    !创建需要输入的文件，'APPEND'表示接着原有内容输入
     c = (a + b) / 2                                         !二点中点
     DO WHILE (abs(a - b) > m)                               !精度要求
         IF (func(a) * func(c) < 0) THEN                     !判断条件
@@ -104,30 +104,30 @@ SUBROUTINE bisection()                                      !二分法求解子�
             j = j + 1                                       !同上
         END IF
     END DO
-    WRITE(11,*) a, func(a), j 
+    WRITE(11,*) a, func(a), j                               !将结果输入值文件，此处不再格式化输出
 END SUBROUTINE
 
 SUBROUTINE newton()                                         !牛顿法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
-    OPEN(UNIT = 12, POSITION = 'APPEND', FILE = "2.dat")
+    OPEN(UNIT = 12, POSITION = 'APPEND', FILE = "2.dat")    !同上
     DO WHILE (abs(a - b) > m)                               !精度要求
         b = a                                               !选取边界a为初始点
         a = a - func(a) / func1(a)                          !带入牛顿法公式计算切线对应的下一个点
         j = j + 1                                           !迭代次数
     END DO    
-    WRITE(12,*) a, func(a), j
+    WRITE(12,*) a, func(a), j                               !同上
 END SUBROUTINE
 
 SUBROUTINE secant()                                         !割线法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
-    OPEN(UNIT = 13, POSITION = 'APPEND', FILE = "3.dat")
+    OPEN(UNIT = 13, POSITION = 'APPEND', FILE = "3.dat")    !同上
     DO WHILE (abs(a - b) > m)                               !精度要求
         c = a - (a - b) * func(a) / (func(a) - func(b))     !带入割线法公式计算割点
         b = a                                               !得到割点后b的取值
         a = c                                               !a的取值，注意赋值的前后顺序
         j = j + 1                                           !迭代次数
     END DO
-    WRITE(13,*) a, func(a), j
+    WRITE(13,*) a, func(a), j                               !同上
 END SUBROUTINE
