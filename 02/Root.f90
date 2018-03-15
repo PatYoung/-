@@ -74,12 +74,13 @@ FUNCTION func1(x)                                           !同上，写出方�
     IMPLICIT NONE
     REAL(KIND = 8) x
     REAL(KIND = 8) func1
-    func1 = exp(x) /x + exp(x) * log(x) - 2 * x              !因为其可解析求导，不再利用数值的方法求解
+    func1 = exp(x) /x + exp(x) * log(x) - 2 * x             !因为其可解析求导，不再利用数值的方法求解
 END FUNCTION
 
 SUBROUTINE bisection()                                      !二分法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
+    OPEN(UNIT = 11, POSITION = 'APPEND', FILE = "1.dat")
     c = (a + b) / 2                                         !二点中点
     DO WHILE (abs(a - b) > m)                               !精度要求
         IF (func(a) * func(c) < 0) THEN                     !判断条件
@@ -92,25 +93,30 @@ SUBROUTINE bisection()                                      !二分法求解子�
             j = j + 1                                       !同上
         END IF
     END DO
+    WRITE(11,*) "a = ",a,func(a),"b = ",b,func(b),j 
 END SUBROUTINE
 
 SUBROUTINE newton()                                         !牛顿法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
+    OPEN(UNIT = 12, POSITION = 'APPEND', FILE = "2.dat")
     DO WHILE (abs(a - b) > m)                               !精度要求
         b = a                                               !选取边界a为初始点
         a = a - func(a) / func1(a)                          !带入牛顿法公式计算切线对应的下一个点
         j = j + 1                                           !迭代次数
     END DO    
+    WRITE(12,*) "a = ",a,func(a),"b = ",b,func(b),j
 END SUBROUTINE
 
 SUBROUTINE secant()                                         !割线法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
+    OPEN(UNIT = 13, POSITION = 'APPEND', FILE = "3.dat")
     DO WHILE (abs(a - b) > m)                               !精度要求
         c = a - (a - b) * func(a) / (func(a) - func(b))     !带入割线法公式计算割点
         b = a                                               !得到割点后b的取值
         a = c                                               !a的取值，注意赋值的前后顺序
         j = j + 1                                           !迭代次数
     END DO
+    WRITE(13,*) "a = ",a,func(a),"b = ",b,func(b),j
 END SUBROUTINE
