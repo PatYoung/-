@@ -45,7 +45,7 @@ PROGRAM root
     WRITE(*,"(4X,20A)") "3.Secant."
     WRITE(*,"(4X,20A)") "0.Exit the program."
     501 READ(*,*) i
-    
+    !判断选择方法
     IF (i == 1) THEN
         CALL bisection()
     ELSE IF (i == 2) THEN
@@ -59,7 +59,7 @@ PROGRAM root
         GOTO 501
     END IF
 
-    WRITE(*,*) a,func(a),j
+    WRITE(*,*) "a = ",a,func(a),"b = ",b,func(b),j
 END PROGRAM
 
 
@@ -107,5 +107,10 @@ END SUBROUTINE
 SUBROUTINE secant()                                         !割线法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
-
+    DO WHILE (abs(a - b) > m)                               !精度要求
+        c = a - (a - b) * func(a) / (func(a) - func(b))     !带入割线法公式计算割点
+        b = a                                               !得到割点后b的取值
+        a = c                                               !a的取值，注意赋值的前后顺序
+        j = j + 1                                           !迭代次数
+    END DO
 END SUBROUTINE
