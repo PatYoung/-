@@ -14,7 +14,7 @@
 MODULE global                                               !全局变量
     IMPLICIT NONE
     INTEGER i,j,k
-    REAL(KIND = 8) a,b,c,n,m,x,y,z
+    REAL(KIND = 8) a,b,c,l,n,m,x,y,z
     REAL(KIND = 8),EXTERNAL :: func,func1                   !注意此处一定要有::，否则编译报错
 END MODULE
 
@@ -25,7 +25,8 @@ PROGRAM root
     !输入精度要求
     WRITE(*,"(50A)") "Input the required significance digit:"
     READ(*,*) n
-    m = 1 / 10**n
+    l = 1
+    m = 1 / 10**l
     
     !输入选择寻求方程解的范围，及判断该范围内是否有解
     500 WRITE(*,"(50A)") "Input the boundary"
@@ -46,20 +47,30 @@ PROGRAM root
     WRITE(*,"(4X,20A)") "0.Exit the program."
     501 READ(*,*) i
     !判断选择方法
-    IF (i == 1) THEN
-        CALL bisection()
-    ELSE IF (i == 2) THEN
-        CALL newton()
-    ELSE IF (i == 3) THEN
-        CALL secant()
-    ELSE IF (i == 0) THEN
-        STOP
-    ELSE
-        WRITE(*,*) "Input the right number!"
-        GOTO 501
-    END IF
-
-    WRITE(*,*) "a = ",a,func(a),"b = ",b,func(b),j
+    DO WHILE (l <= n)
+        IF (i == 1) THEN
+            CALL bisection()
+            l = l + 1
+            m = 1 / 10**l
+        ELSE IF (i == 2) THEN
+            CALL newton()
+            l = l + 1
+            m = 1 / 10**l
+        ELSE IF (i == 3) THEN
+            CALL secant()
+            l = l + 1
+            m = 1 / 10**l
+        ELSE IF (i == 0) THEN
+            STOP
+        ELSE
+            WRITE(*,*) "Input the right number!"
+            GOTO 501
+        END IF
+    END DO
+    WRITE(*,*) a, func(a), j                                !加入文字解释格式不清晰，又不能格式化输出，即去掉文字
+    !WRITE(*,*) "Value:",func(a),"Repeat:",j
+    !600 FORMAT(5A,1X,F18.16)                               !格式化输出显示乱码，注释
+    !601 FORMAT(6A,F18.16,7A,I1)                            !同上
 END PROGRAM
 
 
@@ -93,7 +104,7 @@ SUBROUTINE bisection()                                      !二分法求解子�
             j = j + 1                                       !同上
         END IF
     END DO
-    WRITE(11,*) "a = ",a,func(a),"b = ",b,func(b),j 
+    WRITE(11,*) a, func(a), j 
 END SUBROUTINE
 
 SUBROUTINE newton()                                         !牛顿法求解子程序，需要时调用
@@ -105,7 +116,7 @@ SUBROUTINE newton()                                         !牛顿法求解子�
         a = a - func(a) / func1(a)                          !带入牛顿法公式计算切线对应的下一个点
         j = j + 1                                           !迭代次数
     END DO    
-    WRITE(12,*) "a = ",a,func(a),"b = ",b,func(b),j
+    WRITE(12,*) a, func(a), j
 END SUBROUTINE
 
 SUBROUTINE secant()                                         !割线法求解子程序，需要时调用
@@ -118,5 +129,5 @@ SUBROUTINE secant()                                         !割线法求解子�
         a = c                                               !a的取值，注意赋值的前后顺序
         j = j + 1                                           !迭代次数
     END DO
-    WRITE(13,*) "a = ",a,func(a),"b = ",b,func(b),j
+    WRITE(13,*) a, func(a), j
 END SUBROUTINE
