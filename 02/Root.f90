@@ -15,7 +15,7 @@ MODULE global                                               !全局变量
     IMPLICIT NONE
     INTEGER i,j,k
     REAL(KIND = 8) a,b,c,n,m,x,y,z
-    REAL(KIND = 8),EXTERNAL :: func                         !注意此处一定要有::，否则编译报错
+    REAL(KIND = 8),EXTERNAL :: func,func1                   !注意此处一定要有::，否则编译报错
 END MODULE
 
 PROGRAM root
@@ -70,6 +70,13 @@ FUNCTION func(x)                                            !将需求解函数�
     func = exp(x) * log(x) - x**2
 END FUNCTION
 
+FUNCTION func1(x)                                           !同上，写出方程的一阶导数
+    IMPLICIT NONE
+    REAL(KIND = 8) x
+    REAL(KIND = 8) func1
+    func1 = exp(x) /x + exp(x) * log(x) - 2 * x              !因为其可解析求导，不再利用数值的方法求解
+END FUNCTION
+
 SUBROUTINE bisection()                                      !二分法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
@@ -90,8 +97,11 @@ END SUBROUTINE
 SUBROUTINE newton()                                         !牛顿法求解子程序，需要时调用
     USE global
     IMPLICIT NONE
-
-    
+    DO WHILE (abs(a - b) > m)                               !精度要求
+        b = a                                               !选取边界a为初始点
+        a = a - func(a) / func1(a)                          !带入牛顿法公式计算切线对应的下一个点
+        j = j + 1                                           !迭代次数
+    END DO    
 END SUBROUTINE
 
 SUBROUTINE secant()                                         !割线法求解子程序，需要时调用
